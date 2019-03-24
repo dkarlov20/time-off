@@ -11,7 +11,5 @@ import java.time.LocalDateTime;
 @Builder
 public class Status {
     private int id;
-    private LocalDateTime lastChanged;
-    private User lastChangedBy;
     private String name;
 }

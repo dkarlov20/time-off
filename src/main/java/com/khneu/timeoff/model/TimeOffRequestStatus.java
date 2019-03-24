@@ -9,8 +9,10 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @Builder
-public class TimeOffDate {
+public class TimeOffRequestStatus {
     private int id;
-    private LocalDateTime ymd;
-    private int amount;
+    private TimeOffRequest timeOffRequest;
+    private Status status;
+    private Employee employee;
+    private LocalDateTime last_changed;
 }

@@ -4,10 +4,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @Builder
 public class Employee {
     private int id;
-    private String name;
+    private Position position;
+    private String firstName;
+    private String lastName;
+    private String email;
 }

@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Note {
     private int id;
-    private String from;
+    private Employee employee;
     private String text;
 }

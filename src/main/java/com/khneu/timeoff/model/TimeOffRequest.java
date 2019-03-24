@@ -13,12 +13,11 @@ import java.util.List;
 public class TimeOffRequest {
     private int id;
     private Employee employee;
+    private Status status;
+    private Type type;
+    private List<Note> notes;
+    private List<TimeOffRequestStatus> timeOffRequestStatuses;
     private LocalDateTime start;
     private LocalDateTime end;
     private LocalDateTime created;
-    private Status status;
-    private Type type;
-    private Amount amount;
-    private List<TimeOffDate> timeOffDates;
-    private List<Note> notes;
 }

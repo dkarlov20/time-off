@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Type {
     private int id;
-    private String icon;
     private String name;
 }

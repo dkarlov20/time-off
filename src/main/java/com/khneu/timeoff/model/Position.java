@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Builder
-public class Amount {
+public class Position {
     private int id;
-    private String unit;
-    private int number;
+    private String name;
 }
