@@ -1,13 +1,5 @@
 package com.khneu.timeoff.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@Builder
-public class Type {
-    private int id;
-    private String name;
+public enum Type {
+    VACATION, FULLY_PAID_SICK_LEAVE, COMPENSATORY_LEAVE, UNPAID_VACATION, BLOOD_DONATION, BEREAVEMENT_LEAVE, PARENTAL_LEAVE, WFH
 }

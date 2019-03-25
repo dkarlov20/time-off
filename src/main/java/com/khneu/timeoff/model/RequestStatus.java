@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Builder
-public class Employee {
+public class RequestStatus {
     private int id;
-    private EmployeePosition employeePosition;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private Status status;
 }

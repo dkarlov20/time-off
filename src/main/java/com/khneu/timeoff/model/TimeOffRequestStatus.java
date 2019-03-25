@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class TimeOffRequestStatus {
     private int id;
     private TimeOffRequest timeOffRequest;
-    private Status status;
+    private RequestStatus requestStatus;
     private Employee employee;
-    private LocalDateTime last_changed;
+    private LocalDateTime lastChanged;
 }

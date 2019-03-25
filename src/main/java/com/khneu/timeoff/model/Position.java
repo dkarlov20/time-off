@@ -1,13 +1,5 @@
 package com.khneu.timeoff.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@Builder
-public class Position {
-    private int id;
-    private String name;
+public enum Position {
+    DEVELOPER, QA, AQA, DEVOPS, DESIGNER, LEAD, ARCHITECT, MANAGER, HR
 }
