@@ -21,6 +21,7 @@ create table if not exists note
   id          int auto_increment,
   employee_id int,
   text        varchar(255) not null,
+  created     datetime     not null,
   primary key (id),
   foreign key (employee_id) references employee (id)
 );

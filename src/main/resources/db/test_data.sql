@@ -29,20 +29,20 @@ insert into EMPLOYEE(ID, EMPLOYEE_POSITION_ID, FIRST_NAME, LAST_NAME, EMAIL) val
 insert into EMPLOYEE(ID, EMPLOYEE_POSITION_ID, FIRST_NAME, LAST_NAME, EMAIL) values (  19, 2, 'Haley', 'Frami', 'frami@gmail.com');
 insert into EMPLOYEE(ID, EMPLOYEE_POSITION_ID, FIRST_NAME, LAST_NAME, EMAIL) values (  20, 3, 'Melvina', 'Oberbrunner', 'oberbrunner@gmail.com');
 
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 1, 1, 'going to Paris' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 2, 9, 'good luck' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 3, 4, 'going to WFH' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 4, 14, 'ok' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 5, 12, 'going to hospital' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 6, 15, 'get well' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 7, 8, 'going to Budapest' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 8, 9, 'have fun' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 9, 17, 'going to conference' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 10, 14, 'cool' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 11, 11, 'will WFH' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 12, 15, 'ok' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 13, 10, 'going to skip because of illness' );
-insert into NOTE(ID, EMPLOYEE_ID, TEXT) values ( 14, 9, 'get well' );
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 1, 1, 'going to Paris', '2019-04-29 12:33:00.000000' );
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 2, 9, 'good luck', '2019-04-29 12:35:00.000000');
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 3, 4, 'going to WFH', '2019-03-31 12:35:00.000000' );
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 4, 14, 'ok', '2019-03-31 12:40:00.000000');
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 5, 12, 'going to hospital', '2019-03-15 12:40:00.000000' );
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 6, 15, 'get well', '2019-03-15 12:45:00.000000');
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 7, 8, 'going to Budapest', '2019-04-15 12:50:00.000000' );
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 8, 9, 'have fun', '2019-04-15 12:50:00.000000');
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 9, 17, 'going to conference', '2019-03-09 12:52:00.000000' );
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 10, 14, 'cool', '2019-03-09 12:55:00.000000');
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 11, 11, 'will WFH', '2019-06-27 12:55:00.000000');
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 12, 15, 'ok', '2019-06-27 12:56:00.000000');
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 13, 10, 'going to skip because of illness', '2019-03-22 12:58:00.000000');
+insert into NOTE(ID, EMPLOYEE_ID, TEXT, CREATED) values ( 14, 9, 'get well', '2019-03-22 12:59:00.000000');
 
 insert into REQUEST_STATUS (ID, STATUS) VALUES (1, 'REQUESTED' );
 insert into REQUEST_STATUS (ID, STATUS) VALUES (2, 'APPROVED' );
