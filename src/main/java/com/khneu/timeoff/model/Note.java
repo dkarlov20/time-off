@@ -19,7 +19,7 @@ public class Note implements Serializable {
 
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "employee_id")

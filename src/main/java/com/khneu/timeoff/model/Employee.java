@@ -18,7 +18,7 @@ public class Employee implements Serializable {
 
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "employee_position_id")

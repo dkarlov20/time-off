@@ -19,7 +19,7 @@ public class CurrentRequestStatus implements Serializable {
 
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "request_status_id")

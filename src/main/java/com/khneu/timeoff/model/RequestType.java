@@ -18,7 +18,7 @@ public class RequestType implements Serializable {
 
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
 
     @Enumerated(EnumType.STRING)
     private Type type;
