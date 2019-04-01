@@ -11,8 +11,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"timeOffRequestStatuses"})
-@EqualsAndHashCode(exclude = {"timeOffRequestStatuses"})
 @Entity
 @Table(name = "time_off_request")
 public class TimeOffRequest implements Serializable {
@@ -20,7 +18,7 @@ public class TimeOffRequest implements Serializable {
 
     @Id
     @GeneratedValue
-    private int id;
+    private Integer id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "employee_id")
@@ -30,14 +28,15 @@ public class TimeOffRequest implements Serializable {
     @JoinColumn(name = "request_type_id")
     private RequestType requestType;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "time_off_request_note",
             joinColumns = {@JoinColumn(name = "time_off_request_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "note_id", referencedColumnName = "id")})
     private Set<Note> notes;
 
-    @OneToMany(mappedBy = "timeOffRequest", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Set<TimeOffRequestStatus> timeOffRequestStatuses;
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "current_request_status_id")
+    private CurrentRequestStatus currentRequestStatus;
 
     private LocalDate start;
 

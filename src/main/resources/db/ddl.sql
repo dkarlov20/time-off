@@ -33,6 +33,17 @@ create table if not exists request_status
   primary key (id)
 );
 
+create table if not exists current_request_status
+(
+  id                int auto_increment,
+  request_status_id int,
+  employee_id       int,
+  last_changed      datetime not null,
+  primary key (id),
+  foreign key (request_status_id) REFERENCES request_status (id),
+  foreign key (employee_id) REFERENCES employee (id)
+);
+
 create table if not exists request_type
 (
   id   int auto_increment,
@@ -42,28 +53,17 @@ create table if not exists request_type
 
 create table if not exists time_off_request
 (
-  id              int auto_increment,
-  employee_id     int,
-  request_type_id int,
-  start           date not null,
-  end             date not null,
-  created         date not null,
+  id                        int auto_increment,
+  employee_id               int,
+  request_type_id           int,
+  current_request_status_id int,
+  start                     date not null,
+  end                       date not null,
+  created                   date not null,
   primary key (id),
   foreign key (employee_id) references employee (id),
   foreign key (request_type_id) references request_type (id),
-);
-
-create table if not exists time_off_request_status
-(
-  id                  int auto_increment,
-  time_off_request_id int,
-  request_status_id   int,
-  employee_id         int,
-  last_changed        datetime not null,
-  primary key (id),
-  foreign key (time_off_request_id) REFERENCES time_off_request (id),
-  foreign key (request_status_id) REFERENCES request_status (id),
-  foreign key (employee_id) REFERENCES employee (id)
+  foreign key (current_request_status_id) REFERENCES current_request_status (id),
 );
 
 create table if not exists time_off_request_note
