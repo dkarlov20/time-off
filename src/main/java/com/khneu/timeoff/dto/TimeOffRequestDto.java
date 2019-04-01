@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -16,9 +15,9 @@ public class TimeOffRequestDto {
     private Integer id;
     private EmployeeDto employee;
     private CurrentRequestStatusDto currentRequestStatus;
-    private LocalDate start;
-    private LocalDate end;
-    private LocalDate created;
+    private String start;
+    private String end;
+    private String created;
     private RequestTypeDto requestType;
     private Set<NoteDto> notes;
 }
