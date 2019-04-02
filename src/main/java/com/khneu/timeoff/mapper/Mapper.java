@@ -1,6 +1,8 @@
 package com.khneu.timeoff.mapper;
 
+import com.khneu.timeoff.dto.CurrentRequestStatusDto;
 import com.khneu.timeoff.dto.TimeOffRequestDto;
+import com.khneu.timeoff.model.CurrentRequestStatus;
 import com.khneu.timeoff.model.TimeOffRequest;
 
 import java.util.List;
@@ -12,4 +14,8 @@ public interface Mapper {
     TimeOffRequestDto toTimeOffRequestDto(TimeOffRequest timeOffRequest);
 
     TimeOffRequest toTimeOffRequest(TimeOffRequestDto timeOffRequestDto);
+
+    CurrentRequestStatus toCurrentRequestStatus(CurrentRequestStatusDto currentRequestStatusDto);
+
+
 }

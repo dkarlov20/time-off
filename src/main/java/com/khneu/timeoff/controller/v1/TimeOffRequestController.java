@@ -51,4 +51,12 @@ public class TimeOffRequestController {
     public TimeOffRequestDto saveTimeOffRequest(TimeOffRequestDto timeOffRequest) {
         return timeOffRequestService.saveTimeOffRequest(timeOffRequest);
     }
+
+    @PUT
+    @Path("/requests/{id}/status")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public TimeOffRequestDto changeTimeOffRequestStatus(@PathParam("id") int id, CurrentRequestStatusDto currentRequestStatus) {
+        return timeOffRequestService.changeTimeOffRequestStatus(id, currentRequestStatus);
+    }
 }
