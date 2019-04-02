@@ -21,11 +21,11 @@ public class CurrentRequestStatus implements Serializable {
     @GeneratedValue
     private Integer id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "request_status_id")
     private RequestStatus requestStatus;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
 

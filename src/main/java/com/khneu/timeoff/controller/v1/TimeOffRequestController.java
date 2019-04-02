@@ -7,21 +7,19 @@ import com.khneu.timeoff.service.TimeOffRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @Controller
-@Path("/v1/time_off/requests")
+@Path("/v1/time_off")
 public class TimeOffRequestController {
 
     @Autowired
     private TimeOffRequestService timeOffRequestService;
 
     @GET
+    @Path("/requests")
     @Produces(MediaType.APPLICATION_JSON)
     public List<TimeOffRequestDto> getTimeOffRequests(@QueryParam("id") Integer id,
                                                       @QueryParam("employeeId") Integer employeeId,
@@ -44,5 +42,13 @@ public class TimeOffRequestController {
                 .build();
 
         return timeOffRequestService.getTimeOffRequests(timeOffRequest);
+    }
+
+    @PUT
+    @Path("/request")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public TimeOffRequestDto saveTimeOffRequest(TimeOffRequestDto timeOffRequest) {
+        return timeOffRequestService.saveTimeOffRequest(timeOffRequest);
     }
 }

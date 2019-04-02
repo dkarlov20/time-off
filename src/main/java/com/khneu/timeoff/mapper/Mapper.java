@@ -7,7 +7,9 @@ import java.util.List;
 
 @org.mapstruct.Mapper(componentModel = "spring")
 public interface Mapper {
-    List<TimeOffRequestDto> toTimeOffRequestDto(List<TimeOffRequest> timeOffRequest);
+    List<TimeOffRequestDto> toTimeOffRequestsDto(List<TimeOffRequest> timeOffRequest);
+
+    TimeOffRequestDto toTimeOffRequestDto(TimeOffRequest timeOffRequest);
 
     TimeOffRequest toTimeOffRequest(TimeOffRequestDto timeOffRequestDto);
 }

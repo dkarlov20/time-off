@@ -20,7 +20,7 @@ public class Employee implements Serializable {
     @GeneratedValue
     private Integer id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "employee_position_id")
     private EmployeePosition employeePosition;
 

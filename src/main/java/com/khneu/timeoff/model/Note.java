@@ -21,7 +21,7 @@ public class Note implements Serializable {
     @GeneratedValue
     private Integer id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
 

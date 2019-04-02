@@ -22,6 +22,11 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
 
     @Override
     public List<TimeOffRequestDto> getTimeOffRequests(TimeOffRequestDto timeOffRequest) {
-        return mapper.toTimeOffRequestDto(timeOffRequestRepository.findAll(getSpecification(mapper.toTimeOffRequest(timeOffRequest))));
+        return mapper.toTimeOffRequestsDto(timeOffRequestRepository.findAll(getSpecification(mapper.toTimeOffRequest(timeOffRequest))));
+    }
+
+    @Override
+    public TimeOffRequestDto saveTimeOffRequest(TimeOffRequestDto timeOffRequest) {
+        return mapper.toTimeOffRequestDto(timeOffRequestRepository.save(mapper.toTimeOffRequest(timeOffRequest)));
     }
 }

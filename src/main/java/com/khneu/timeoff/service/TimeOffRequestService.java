@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface TimeOffRequestService {
     List<TimeOffRequestDto> getTimeOffRequests(TimeOffRequestDto timeOffRequest);
+
+    TimeOffRequestDto saveTimeOffRequest(TimeOffRequestDto timeOffRequest);
 }

@@ -20,21 +20,21 @@ public class TimeOffRequest implements Serializable {
     @GeneratedValue
     private Integer id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "request_type_id")
     private RequestType requestType;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "time_off_request_note",
             joinColumns = {@JoinColumn(name = "time_off_request_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "note_id", referencedColumnName = "id")})
     private Set<Note> notes;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "current_request_status_id")
     private CurrentRequestStatus currentRequestStatus;
 
