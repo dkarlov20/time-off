@@ -5,28 +5,24 @@ import com.khneu.timeoff.model.Status;
 import com.khneu.timeoff.model.Type;
 import com.khneu.timeoff.service.TimeOffRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@Controller
-@Path("/v1/time_off")
+@RestController
+@RequestMapping("/v1/time_off")
 public class TimeOffRequestController {
 
     @Autowired
     private TimeOffRequestService timeOffRequestService;
 
-    @GET
-    @Path("/requests")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<TimeOffRequestDto> getTimeOffRequests(@QueryParam("id") Integer id,
-                                                      @QueryParam("employeeId") Integer employeeId,
-                                                      @QueryParam("start") String start,
-                                                      @QueryParam("end") String end,
-                                                      @QueryParam("type") Type type,
-                                                      @QueryParam("status") Status status) {
+    @GetMapping("/requests")
+    public List<TimeOffRequestDto> getTimeOffRequests(@RequestParam(value = "id", required = false) Integer id,
+                                                      @RequestParam(value = "employeeId", required = false) Integer employeeId,
+                                                      @RequestParam(value = "start", required = false) String start,
+                                                      @RequestParam(value = "end", required = false) String end,
+                                                      @RequestParam(value = "type", required = false) Type type,
+                                                      @RequestParam(value = "status", required = false) Status status) {
 
         TimeOffRequestDto timeOffRequest = TimeOffRequestDto.builder()
                 .id(id)
@@ -44,19 +40,13 @@ public class TimeOffRequestController {
         return timeOffRequestService.getTimeOffRequests(timeOffRequest);
     }
 
-    @PUT
-    @Path("/request")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public TimeOffRequestDto saveTimeOffRequest(TimeOffRequestDto timeOffRequest) {
+    @PutMapping("/request")
+    public TimeOffRequestDto saveTimeOffRequest(@RequestBody TimeOffRequestDto timeOffRequest) {
         return timeOffRequestService.saveTimeOffRequest(timeOffRequest);
     }
 
-    @PUT
-    @Path("/requests/{id}/status")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public TimeOffRequestDto changeTimeOffRequestStatus(@PathParam("id") int id, CurrentRequestStatusDto currentRequestStatus) {
+    @PutMapping("/requests/{id}/status")
+    public TimeOffRequestDto changeTimeOffRequestStatus(@PathVariable Integer id, @RequestBody CurrentRequestStatusDto currentRequestStatus) {
         return timeOffRequestService.changeTimeOffRequestStatus(id, currentRequestStatus);
     }
 }
