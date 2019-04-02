@@ -8,20 +8,11 @@ import javax.persistence.criteria.Join;
 import java.time.LocalDate;
 
 public class TimeOffRequestSpecification {
-    public static Specification<TimeOffRequest> getSpecification(TimeOffRequest timeOffRequest) {
-        return Specification.where(getTimeOffRequestById(timeOffRequest.getId()))
-                .and(getTimeOffRequestByEmployeeId(timeOffRequest.getEmployee().getId()))
-                .and(getTimeOffRequestByStart(timeOffRequest.getStart()))
-                .and(getTimeOffRequestByEnd(timeOffRequest.getEnd()))
-                .and(getTimeOffRequestByType(timeOffRequest.getRequestType().getType()))
-                .and(getTimeOffRequestByStatus(timeOffRequest.getCurrentRequestStatus().getRequestStatus().getStatus()));
-    }
-
-    private static Specification<TimeOffRequest> getTimeOffRequestById(Integer id) {
+    public static Specification<TimeOffRequest> getTimeOffRequestById(Integer id) {
         return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> id == null ? null : criteriaBuilder.equal(root.get(TimeOffRequest_.id), id);
     }
 
-    private static Specification<TimeOffRequest> getTimeOffRequestByEmployeeId(Integer employeeId) {
+    public static Specification<TimeOffRequest> getTimeOffRequestByEmployeeId(Integer employeeId) {
         return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> {
             if (employeeId == null) {
                 return null;
@@ -32,15 +23,15 @@ public class TimeOffRequestSpecification {
         };
     }
 
-    private static Specification<TimeOffRequest> getTimeOffRequestByStart(LocalDate start) {
+    public static Specification<TimeOffRequest> getTimeOffRequestByStart(LocalDate start) {
         return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> start == null ? null : criteriaBuilder.greaterThanOrEqualTo(root.get(TimeOffRequest_.start), start);
     }
 
-    private static Specification<TimeOffRequest> getTimeOffRequestByEnd(LocalDate end) {
+    public static Specification<TimeOffRequest> getTimeOffRequestByEnd(LocalDate end) {
         return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> end == null ? null : criteriaBuilder.lessThanOrEqualTo(root.get(TimeOffRequest_.end), end);
     }
 
-    private static Specification<TimeOffRequest> getTimeOffRequestByType(Type type) {
+    public static Specification<TimeOffRequest> getTimeOffRequestByType(Type type) {
         return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> {
             if (type == null) {
                 return null;
@@ -51,7 +42,7 @@ public class TimeOffRequestSpecification {
         };
     }
 
-    private static Specification<TimeOffRequest> getTimeOffRequestByStatus(Status status) {
+    public static Specification<TimeOffRequest> getTimeOffRequestByStatus(Status status) {
         return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> {
             if (status == null) {
                 return null;

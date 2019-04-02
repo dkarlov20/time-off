@@ -9,12 +9,13 @@ import com.khneu.timeoff.model.TimeOffRequest;
 import com.khneu.timeoff.repository.TimeOffRequestRepository;
 import com.khneu.timeoff.service.TimeOffRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.khneu.timeoff.specification.TimeOffRequestSpecification.getSpecification;
+import static com.khneu.timeoff.specification.TimeOffRequestSpecification.*;
 
 @Service
 public class TimeOffRequestServiceImpl implements TimeOffRequestService {
@@ -26,8 +27,15 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     private Mapper mapper;
 
     @Override
-    public List<TimeOffRequestDto> getTimeOffRequests(TimeOffRequestDto timeOffRequest) {
-        return mapper.toTimeOffRequestsDto(timeOffRequestRepository.findAll(getSpecification(mapper.toTimeOffRequest(timeOffRequest))));
+    public List<TimeOffRequestDto> getTimeOffRequests(TimeOffRequestDto timeOffRequestDto) {
+        TimeOffRequest timeOffRequest = mapper.toTimeOffRequest(timeOffRequestDto);
+
+        return mapper.toTimeOffRequestsDto(timeOffRequestRepository.findAll(Specification.where(getTimeOffRequestById(timeOffRequest.getId()))
+                .and(getTimeOffRequestByEmployeeId(timeOffRequest.getEmployee().getId()))
+                .and(getTimeOffRequestByStart(timeOffRequest.getStart()))
+                .and(getTimeOffRequestByEnd(timeOffRequest.getEnd()))
+                .and(getTimeOffRequestByType(timeOffRequest.getRequestType().getType()))
+                .and(getTimeOffRequestByStatus(timeOffRequest.getCurrentRequestStatus().getRequestStatus().getStatus()))));
     }
 
     @Override
