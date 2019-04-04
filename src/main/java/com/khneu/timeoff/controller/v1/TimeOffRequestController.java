@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/time_off")
 public class TimeOffRequestController {
+    private static final int DEFAULT_END_DAYS = 14;
 
     @Autowired
     private TimeOffRequestService timeOffRequestService;
@@ -59,5 +60,15 @@ public class TimeOffRequestController {
                                        @RequestParam(value = "end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
 
         return timeOffRequestService.estimateTimeOff(employeeId, end);
+    }
+
+    @GetMapping("/whos_out")
+    public List<OutEmployeesDto> getOutEmployees(@RequestParam(value = "start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+                                                 @RequestParam(value = "end", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        if (end == null) {
+            end = start.plusDays(DEFAULT_END_DAYS);
+        }
+
+        return timeOffRequestService.getOutEmployees(start, end);
     }
 }

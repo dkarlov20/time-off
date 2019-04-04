@@ -2,10 +2,12 @@ package com.khneu.timeoff.service.impl;
 
 import com.khneu.timeoff.dto.CurrentRequestStatusDto;
 import com.khneu.timeoff.dto.EstimateDto;
+import com.khneu.timeoff.dto.OutEmployeesDto;
 import com.khneu.timeoff.dto.TimeOffRequestDto;
 import com.khneu.timeoff.exception.NoSuchEntityException;
 import com.khneu.timeoff.mapper.Mapper;
 import com.khneu.timeoff.model.CurrentRequestStatus;
+import com.khneu.timeoff.model.Status;
 import com.khneu.timeoff.model.TimeOffRequest;
 import com.khneu.timeoff.model.Type;
 import com.khneu.timeoff.repository.TimeOffRequestRepository;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,10 +72,32 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     public EstimateDto estimateTimeOff(int employeeId, LocalDate end) {
         List<TimeOffRequest> timeOffRequests = timeOffRequestRepository.findAll(Specification
                 .where(getTimeOffRequestByEmployeeId(employeeId))
+                .and(getTimeOffRequestByStatus(Status.APPROVED))
                 .and(Specification.where(getTimeOffRequestByType(Type.FULLY_PAID_SICK_LEAVE))
                         .or(getTimeOffRequestByType(Type.VACATION))));
 
         return timeOffRequests.size() == 0 ? estimateEmptyTimeOff(end) : estimateUsedTimeOff(end, timeOffRequests);
+    }
+
+    @Override
+    public List<OutEmployeesDto> getOutEmployees(LocalDate start, LocalDate end) {
+        List<OutEmployeesDto> outEmployees = new ArrayList<>();
+
+        List<TimeOffRequest> timeOffRequests = timeOffRequestRepository.findAll(Specification
+                .where(getTimeOffRequestByStatus(Status.APPROVED))
+                .and(getTimeOffRequestByStart(start))
+                .and(getTimeOffRequestByEnd(end)));
+
+        timeOffRequests.forEach(timeOffRequest -> outEmployees.add(OutEmployeesDto.builder()
+                .timeOffRequestId(timeOffRequest.getId())
+                .employee(mapper.toEmployeeDto(timeOffRequest.getEmployee()))
+                .start(timeOffRequest.getStart().toString())
+                .end(timeOffRequest.getEnd().toString())
+                .build()));
+
+        outEmployees.sort(Comparator.comparing(OutEmployeesDto::getStart));
+
+        return outEmployees;
     }
 
     private EstimateDto estimateUsedTimeOff(LocalDate end, List<TimeOffRequest> timeOffRequests) {

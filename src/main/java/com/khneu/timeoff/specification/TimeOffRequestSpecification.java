@@ -9,7 +9,8 @@ import java.time.LocalDate;
 
 public class TimeOffRequestSpecification {
     public static Specification<TimeOffRequest> getTimeOffRequestById(Integer id) {
-        return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> id == null ? null : criteriaBuilder.equal(root.get(TimeOffRequest_.id), id);
+        return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> id == null ?
+                null : criteriaBuilder.equal(root.get(TimeOffRequest_.id), id);
     }
 
     public static Specification<TimeOffRequest> getTimeOffRequestByEmployeeId(Integer employeeId) {
@@ -24,11 +25,13 @@ public class TimeOffRequestSpecification {
     }
 
     public static Specification<TimeOffRequest> getTimeOffRequestByStart(LocalDate start) {
-        return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> start == null ? null : criteriaBuilder.greaterThanOrEqualTo(root.get(TimeOffRequest_.start), start);
+        return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> start == null ?
+                null : criteriaBuilder.greaterThanOrEqualTo(root.get(TimeOffRequest_.start), start);
     }
 
     public static Specification<TimeOffRequest> getTimeOffRequestByEnd(LocalDate end) {
-        return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> end == null ? null : criteriaBuilder.lessThanOrEqualTo(root.get(TimeOffRequest_.end), end);
+        return (Specification<TimeOffRequest>) (root, query, criteriaBuilder) -> end == null ?
+                null : criteriaBuilder.lessThanOrEqualTo(root.get(TimeOffRequest_.end), end);
     }
 
     public static Specification<TimeOffRequest> getTimeOffRequestByType(Type type) {
