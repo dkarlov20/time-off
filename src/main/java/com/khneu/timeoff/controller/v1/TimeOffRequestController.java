@@ -5,8 +5,10 @@ import com.khneu.timeoff.model.Status;
 import com.khneu.timeoff.model.Type;
 import com.khneu.timeoff.service.TimeOffRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -46,7 +48,16 @@ public class TimeOffRequestController {
     }
 
     @PutMapping("/requests/{id}/status")
-    public TimeOffRequestDto changeTimeOffRequestStatus(@PathVariable Integer id, @RequestBody CurrentRequestStatusDto currentRequestStatus) {
+    public TimeOffRequestDto changeTimeOffRequestStatus(@PathVariable Integer id,
+                                                        @RequestBody CurrentRequestStatusDto currentRequestStatus) {
+
         return timeOffRequestService.changeTimeOffRequestStatus(id, currentRequestStatus);
+    }
+
+    @GetMapping("/estimate")
+    public EstimateDto estimateTimeOff(@RequestParam(value = "employeeId") Integer employeeId,
+                                       @RequestParam(value = "end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+
+        return timeOffRequestService.estimateTimeOff(employeeId, end);
     }
 }

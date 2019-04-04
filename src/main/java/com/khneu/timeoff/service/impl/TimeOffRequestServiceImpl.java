@@ -1,21 +1,29 @@
 package com.khneu.timeoff.service.impl;
 
 import com.khneu.timeoff.dto.CurrentRequestStatusDto;
+import com.khneu.timeoff.dto.EstimateDto;
 import com.khneu.timeoff.dto.TimeOffRequestDto;
 import com.khneu.timeoff.exception.NoSuchEntityException;
 import com.khneu.timeoff.mapper.Mapper;
 import com.khneu.timeoff.model.CurrentRequestStatus;
 import com.khneu.timeoff.model.TimeOffRequest;
+import com.khneu.timeoff.model.Type;
 import com.khneu.timeoff.repository.TimeOffRequestRepository;
 import com.khneu.timeoff.service.TimeOffRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.khneu.timeoff.constant.TimeOffAccrual.FULLY_PAID_SICK_LEAVE;
+import static com.khneu.timeoff.constant.TimeOffAccrual.VACATION;
 import static com.khneu.timeoff.specification.TimeOffRequestSpecification.*;
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Service
 public class TimeOffRequestServiceImpl implements TimeOffRequestService {
@@ -54,5 +62,52 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
         timeOffRequest.getCurrentRequestStatus().setLastChanged(LocalDateTime.now());
 
         return mapper.toTimeOffRequestDto(timeOffRequestRepository.save(timeOffRequest));
+    }
+
+    @Override
+    public EstimateDto estimateTimeOff(int employeeId, LocalDate end) {
+        List<TimeOffRequest> timeOffRequests = timeOffRequestRepository.findAll(Specification
+                .where(getTimeOffRequestByEmployeeId(employeeId))
+                .and(Specification.where(getTimeOffRequestByType(Type.FULLY_PAID_SICK_LEAVE))
+                        .or(getTimeOffRequestByType(Type.VACATION))));
+
+        return timeOffRequests.size() == 0 ? estimateEmptyTimeOff(end) : estimateUsedTimeOff(end, timeOffRequests);
+    }
+
+    private EstimateDto estimateUsedTimeOff(LocalDate end, List<TimeOffRequest> timeOffRequests) {
+        int usedVacationDays = countUsedDays(filterTimeOffListByType(timeOffRequests, Type.VACATION));
+        int usedSickLeaveDays = countUsedDays(filterTimeOffListByType(timeOffRequests, Type.FULLY_PAID_SICK_LEAVE));
+
+        return new EstimateDto(estimatePossibleVacationBalance(end) - usedVacationDays,
+                FULLY_PAID_SICK_LEAVE - usedSickLeaveDays);
+    }
+
+    private EstimateDto estimateEmptyTimeOff(LocalDate end) {
+        return new EstimateDto(estimatePossibleVacationBalance(end), FULLY_PAID_SICK_LEAVE);
+    }
+
+    private int countUsedDays(List<TimeOffRequest> timeOffRequests) {
+        int usedDays = 0;
+        for (TimeOffRequest timeOffRequest : timeOffRequests) {
+            usedDays += getTimeOffDaysAmount(timeOffRequest.getStart(), timeOffRequest.getEnd());
+        }
+
+        return usedDays;
+    }
+
+    private List<TimeOffRequest> filterTimeOffListByType(List<TimeOffRequest> timeOffRequests, Type type) {
+        return timeOffRequests
+                .stream()
+                .filter(timeOffRequest -> timeOffRequest.getRequestType().getType() == type)
+                .collect(Collectors.toList());
+    }
+
+    private float estimatePossibleVacationBalance(LocalDate end) {
+        return end.equals(end.with(TemporalAdjusters.lastDayOfMonth())) ?
+                end.getMonthValue() * VACATION : (end.getMonthValue() - 1) * VACATION;
+    }
+
+    private int getTimeOffDaysAmount(LocalDate start, LocalDate end) {
+        return (int) DAYS.between(start, end);
     }
 }
