@@ -1,11 +1,7 @@
 package com.khneu.timeoff.mapper;
 
-import com.khneu.timeoff.dto.CurrentRequestStatusDto;
-import com.khneu.timeoff.dto.EmployeeDto;
-import com.khneu.timeoff.dto.TimeOffRequestDto;
-import com.khneu.timeoff.model.CurrentRequestStatus;
-import com.khneu.timeoff.model.Employee;
-import com.khneu.timeoff.model.TimeOffRequest;
+import com.khneu.timeoff.dto.*;
+import com.khneu.timeoff.model.*;
 
 import java.util.List;
 
@@ -20,4 +16,8 @@ public interface Mapper {
     CurrentRequestStatus toCurrentRequestStatus(CurrentRequestStatusDto currentRequestStatusDto);
 
     EmployeeDto toEmployeeDto(Employee employee);
+
+    RequestStatusDto toRequestStatusDto(RequestStatus requestStatus);
+
+    RequestTypeDto toRequestTypeDto(RequestType requestType);
 }
