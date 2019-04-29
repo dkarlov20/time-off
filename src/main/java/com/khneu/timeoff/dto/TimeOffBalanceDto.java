@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class TimeOffBalanceDto {
-    private RequestTypeDto requestTypeDto;
+    private RequestTypeDto requestType;
     private Integer usedDays;
     private Float availableDays;
 }

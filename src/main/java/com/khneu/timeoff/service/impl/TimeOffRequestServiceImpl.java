@@ -16,7 +16,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Multimaps.index;
@@ -41,12 +44,16 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     public List<TimeOffRequestDto> getTimeOffRequests(TimeOffRequestDto timeOffRequestDto) {
         TimeOffRequest timeOffRequest = mapper.toTimeOffRequest(timeOffRequestDto);
 
-        return mapper.toTimeOffRequestsDto(timeOffRequestRepository.findAll(Specification.where(getTimeOffRequestById(timeOffRequest.getId()))
+        List<TimeOffRequestDto> timeOffRequestDtos = mapper.toTimeOffRequestsDto(timeOffRequestRepository.findAll(Specification.where(getTimeOffRequestById(timeOffRequest.getId()))
                 .and(getTimeOffRequestByEmployeeId(timeOffRequest.getEmployee().getId()))
                 .and(getTimeOffRequestByStart(timeOffRequest.getStart()))
                 .and(getTimeOffRequestByEnd(timeOffRequest.getEnd()))
                 .and(getTimeOffRequestByType(timeOffRequest.getRequestType().getType()))
                 .and(getTimeOffRequestByStatus(timeOffRequest.getCurrentRequestStatus().getRequestStatus().getStatus()))));
+
+        timeOffRequestDtos.forEach(t -> t.setDaysAmount(getTimeOffDaysAmount(t.getStart(), t.getEnd())));
+
+        return timeOffRequestDtos;
     }
 
     @Override
@@ -109,7 +116,7 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
 
         return requestTypeRepository.findAll().stream()
                 .map(requestType -> TimeOffBalanceDto.builder()
-                        .requestTypeDto(mapper.toRequestTypeDto(requestType))
+                        .requestType(mapper.toRequestTypeDto(requestType))
                         .usedDays(countUsedDays(timeOffRequestMultimap.get(requestType)))
                         .availableDays(countAvailableDays(timeOffRequestMultimap.get(requestType), requestType.getType()))
                         .build())
