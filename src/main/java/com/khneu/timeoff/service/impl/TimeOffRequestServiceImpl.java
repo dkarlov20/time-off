@@ -1,15 +1,12 @@
 package com.khneu.timeoff.service.impl;
 
-import com.khneu.timeoff.dto.CurrentRequestStatusDto;
-import com.khneu.timeoff.dto.EstimateDto;
-import com.khneu.timeoff.dto.OutEmployeesDto;
-import com.khneu.timeoff.dto.TimeOffRequestDto;
+import com.google.common.collect.Multimap;
+import com.khneu.timeoff.constant.TimeOffAccrual;
+import com.khneu.timeoff.dto.*;
 import com.khneu.timeoff.exception.NoSuchEntityException;
 import com.khneu.timeoff.mapper.Mapper;
-import com.khneu.timeoff.model.CurrentRequestStatus;
-import com.khneu.timeoff.model.Status;
-import com.khneu.timeoff.model.TimeOffRequest;
-import com.khneu.timeoff.model.Type;
+import com.khneu.timeoff.model.*;
+import com.khneu.timeoff.repository.RequestTypeRepository;
 import com.khneu.timeoff.repository.TimeOffRequestRepository;
 import com.khneu.timeoff.service.TimeOffRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,21 +16,23 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.khneu.timeoff.constant.TimeOffAccrual.FULLY_PAID_SICK_LEAVE;
+import static com.google.common.collect.Multimaps.index;
 import static com.khneu.timeoff.constant.TimeOffAccrual.VACATION;
 import static com.khneu.timeoff.specification.TimeOffRequestSpecification.*;
-import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.DayOfWeek.SATURDAY;
+import static java.time.DayOfWeek.SUNDAY;
 
 @Service
 public class TimeOffRequestServiceImpl implements TimeOffRequestService {
 
     @Autowired
     private TimeOffRequestRepository timeOffRequestRepository;
+
+    @Autowired
+    private RequestTypeRepository requestTypeRepository;
 
     @Autowired
     private Mapper mapper;
@@ -100,19 +99,39 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
         return outEmployees;
     }
 
+    @Override
+    public List<TimeOffBalanceDto> getTimeOffBalance(int employeeId) {
+        Multimap<RequestType, TimeOffRequest> timeOffRequestMultimap = index(
+                timeOffRequestRepository.findAll(Specification
+                        .where(getTimeOffRequestByEmployeeId(employeeId))
+                        .and(getTimeOffRequestByStatus(Status.APPROVED))),
+                TimeOffRequest::getRequestType);
+
+        return requestTypeRepository.findAll().stream()
+                .map(requestType -> TimeOffBalanceDto.builder()
+                        .requestTypeDto(mapper.toRequestTypeDto(requestType))
+                        .usedDays(countUsedDays(timeOffRequestMultimap.get(requestType)))
+                        .availableDays(countAvailableDays(timeOffRequestMultimap.get(requestType), requestType.getType()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     private EstimateDto estimateUsedTimeOff(LocalDate end, List<TimeOffRequest> timeOffRequests) {
-        int usedVacationDays = countUsedDays(filterTimeOffListByType(timeOffRequests, Type.VACATION));
-        int usedSickLeaveDays = countUsedDays(filterTimeOffListByType(timeOffRequests, Type.FULLY_PAID_SICK_LEAVE));
+        Multimap<Type, TimeOffRequest> timeOffRequestMultimap = index(timeOffRequests,
+                timeOffRequest -> timeOffRequest.getRequestType().getType());
+
+        int usedVacationDays = countUsedDays(timeOffRequestMultimap.get(Type.VACATION));
+        int usedSickLeaveDays = countUsedDays(timeOffRequestMultimap.get(Type.FULLY_PAID_SICK_LEAVE));
 
         return new EstimateDto(estimatePossibleVacationBalance(end) - usedVacationDays,
-                FULLY_PAID_SICK_LEAVE - usedSickLeaveDays);
+                TimeOffAccrual.FULLY_PAID_SICK_LEAVE - usedSickLeaveDays);
     }
 
     private EstimateDto estimateEmptyTimeOff(LocalDate end) {
-        return new EstimateDto(estimatePossibleVacationBalance(end), FULLY_PAID_SICK_LEAVE);
+        return new EstimateDto(estimatePossibleVacationBalance(end), TimeOffAccrual.FULLY_PAID_SICK_LEAVE);
     }
 
-    private int countUsedDays(List<TimeOffRequest> timeOffRequests) {
+    private int countUsedDays(Collection<TimeOffRequest> timeOffRequests) {
         int usedDays = 0;
         for (TimeOffRequest timeOffRequest : timeOffRequests) {
             usedDays += getTimeOffDaysAmount(timeOffRequest.getStart(), timeOffRequest.getEnd());
@@ -121,11 +140,17 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
         return usedDays;
     }
 
-    private List<TimeOffRequest> filterTimeOffListByType(List<TimeOffRequest> timeOffRequests, Type type) {
-        return timeOffRequests
-                .stream()
-                .filter(timeOffRequest -> timeOffRequest.getRequestType().getType() == type)
-                .collect(Collectors.toList());
+    private float countAvailableDays(Collection<TimeOffRequest> timeOffRequests, Type type) {
+        if (type == Type.VACATION || type == Type.FULLY_PAID_SICK_LEAVE) {
+            int usedDays = countUsedDays(timeOffRequests);
+
+            return type == Type.VACATION ?
+                    estimatePossibleVacationBalance(LocalDate.now()) - usedDays
+                    :
+                    (float) (TimeOffAccrual.FULLY_PAID_SICK_LEAVE - usedDays);
+        } else {
+            return 0;
+        }
     }
 
     private float estimatePossibleVacationBalance(LocalDate end) {
@@ -134,6 +159,16 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     }
 
     private int getTimeOffDaysAmount(LocalDate start, LocalDate end) {
-        return (int) DAYS.between(start, end);
+        int amount = 0;
+        LocalDate date = start;
+
+        while (!date.minusDays(1).equals(end)) {
+            if (date.getDayOfWeek() != SATURDAY && date.getDayOfWeek() != SUNDAY) {
+                amount++;
+            }
+            date = date.plusDays(1);
+        }
+
+        return amount;
     }
 }

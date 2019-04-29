@@ -55,14 +55,14 @@ public class TimeOffRequestController {
         return timeOffRequestService.changeTimeOffRequestStatus(id, currentRequestStatus);
     }
 
-    @GetMapping("/estimate")
+    @GetMapping("/estimation")
     public EstimateDto estimateTimeOff(@RequestParam(value = "employeeId") Integer employeeId,
                                        @RequestParam(value = "end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
 
         return timeOffRequestService.estimateTimeOff(employeeId, end);
     }
 
-    @GetMapping("/whos_out")
+    @GetMapping("/whos-out")
     public List<OutEmployeesDto> getOutEmployees(@RequestParam(value = "start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
                                                  @RequestParam(value = "end", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         if (end == null) {
@@ -70,5 +70,10 @@ public class TimeOffRequestController {
         }
 
         return timeOffRequestService.getOutEmployees(start, end);
+    }
+
+    @GetMapping("/balance/{employeeId}")
+    public List<TimeOffBalanceDto> getTimeOffBalance(@PathVariable Integer employeeId){
+        return timeOffRequestService.getTimeOffBalance(employeeId);
     }
 }
