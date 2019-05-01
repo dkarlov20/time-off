@@ -13,6 +13,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
+
     @ExceptionHandler(NoSuchEntityException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDetails handleNoSuchEntityException(NoSuchEntityException e) {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v1/request_statuses")
 public class RequestStatusController {
+
     @Autowired
     private RequestStatusService requestStatusService;
 

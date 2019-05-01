@@ -10,7 +10,6 @@ import com.khneu.timeoff.repository.RequestTypeRepository;
 import com.khneu.timeoff.repository.TimeOffRequestRepository;
 import com.khneu.timeoff.service.TimeOffRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,18 +17,19 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Multimaps.index;
-import static com.khneu.timeoff.constant.TimeOffAccrual.VACATION;
 import static com.khneu.timeoff.specification.TimeOffRequestSpecification.*;
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
+import static java.util.Comparator.comparing;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
 public class TimeOffRequestServiceImpl implements TimeOffRequestService {
+    private static final int DEFAULT_END_DAYS = 14;
 
     @Autowired
     private TimeOffRequestRepository timeOffRequestRepository;
@@ -44,16 +44,19 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     public List<TimeOffRequestDto> getTimeOffRequests(TimeOffRequestDto timeOffRequestDto) {
         TimeOffRequest timeOffRequest = mapper.toTimeOffRequest(timeOffRequestDto);
 
-        List<TimeOffRequestDto> timeOffRequestDtos = mapper.toTimeOffRequestsDto(timeOffRequestRepository.findAll(Specification.where(getTimeOffRequestById(timeOffRequest.getId()))
-                .and(getTimeOffRequestByEmployeeId(timeOffRequest.getEmployee().getId()))
-                .and(getTimeOffRequestByStart(timeOffRequest.getStart()))
-                .and(getTimeOffRequestByEnd(timeOffRequest.getEnd()))
-                .and(getTimeOffRequestByType(timeOffRequest.getRequestType().getType()))
-                .and(getTimeOffRequestByStatus(timeOffRequest.getCurrentRequestStatus().getRequestStatus().getStatus()))));
+        List<TimeOffRequestDto> timeOffRequests = mapper.toTimeOffRequestsDto(timeOffRequestRepository.findAll(
+                where(getTimeOffRequestById(timeOffRequest.getId()))
+                        .and(getTimeOffRequestByEmployeeId(timeOffRequest.getEmployee().getId()))
+                        .and(getTimeOffRequestByStart(timeOffRequest.getStart()))
+                        .and(getTimeOffRequestByEnd(timeOffRequest.getEnd()))
+                        .and(getTimeOffRequestByType(timeOffRequest.getRequestType().getType()))
+                        .and(getTimeOffRequestByStatus(timeOffRequest.getCurrentRequestStatus().getRequestStatus().getStatus()))));
 
-        timeOffRequestDtos.forEach(t -> t.setDaysAmount(getTimeOffDaysAmount(t.getStart(), t.getEnd())));
+        for (TimeOffRequestDto t : timeOffRequests) {
+            t.setDaysAmount(getTimeOffDaysAmount(t.getStart(), t.getEnd()));
+        }
 
-        return timeOffRequestDtos;
+        return timeOffRequests;
     }
 
     @Override
@@ -76,11 +79,11 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
 
     @Override
     public EstimateDto estimateTimeOff(int employeeId, LocalDate end) {
-        List<TimeOffRequest> timeOffRequests = timeOffRequestRepository.findAll(Specification
-                .where(getTimeOffRequestByEmployeeId(employeeId))
-                .and(getTimeOffRequestByStatus(Status.APPROVED))
-                .and(Specification.where(getTimeOffRequestByType(Type.FULLY_PAID_SICK_LEAVE))
-                        .or(getTimeOffRequestByType(Type.VACATION))));
+        List<TimeOffRequest> timeOffRequests = timeOffRequestRepository.findAll(
+                where(getTimeOffRequestByEmployeeId(employeeId))
+                        .and(getTimeOffRequestByStatus(Status.APPROVED))
+                        .and(where(getTimeOffRequestByType(Type.FULLY_PAID_SICK_LEAVE))
+                                .or(getTimeOffRequestByType(Type.VACATION))));
 
         return timeOffRequests.size() == 0 ? estimateEmptyTimeOff(end) : estimateUsedTimeOff(end, timeOffRequests);
     }
@@ -89,10 +92,14 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     public List<OutEmployeesDto> getOutEmployees(LocalDate start, LocalDate end) {
         List<OutEmployeesDto> outEmployees = new ArrayList<>();
 
-        List<TimeOffRequest> timeOffRequests = timeOffRequestRepository.findAll(Specification
-                .where(getTimeOffRequestByStatus(Status.APPROVED))
-                .and(getTimeOffRequestByStart(start))
-                .and(getTimeOffRequestByEnd(end)));
+        if (end == null) {
+            end = start.plusDays(DEFAULT_END_DAYS);
+        }
+
+        List<TimeOffRequest> timeOffRequests = timeOffRequestRepository.findAll(
+                where(getTimeOffRequestByStatus(Status.APPROVED))
+                        .and(getTimeOffRequestByStart(start))
+                        .and(getTimeOffRequestByEnd(end)));
 
         timeOffRequests.forEach(timeOffRequest -> outEmployees.add(OutEmployeesDto.builder()
                 .timeOffRequestId(timeOffRequest.getId())
@@ -101,7 +108,7 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
                 .end(timeOffRequest.getEnd().toString())
                 .build()));
 
-        outEmployees.sort(Comparator.comparing(OutEmployeesDto::getStart));
+        outEmployees.sort(comparing(OutEmployeesDto::getStart));
 
         return outEmployees;
     }
@@ -109,10 +116,9 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     @Override
     public List<TimeOffBalanceDto> getTimeOffBalance(int employeeId) {
         Multimap<RequestType, TimeOffRequest> timeOffRequestMultimap = index(
-                timeOffRequestRepository.findAll(Specification
-                        .where(getTimeOffRequestByEmployeeId(employeeId))
-                        .and(getTimeOffRequestByStatus(Status.APPROVED))),
-                TimeOffRequest::getRequestType);
+                timeOffRequestRepository.findAll(
+                        where(getTimeOffRequestByEmployeeId(employeeId))
+                                .and(getTimeOffRequestByStatus(Status.APPROVED))), TimeOffRequest::getRequestType);
 
         return requestTypeRepository.findAll().stream()
                 .map(requestType -> TimeOffBalanceDto.builder()
@@ -139,12 +145,9 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     }
 
     private int countUsedDays(Collection<TimeOffRequest> timeOffRequests) {
-        int usedDays = 0;
-        for (TimeOffRequest timeOffRequest : timeOffRequests) {
-            usedDays += getTimeOffDaysAmount(timeOffRequest.getStart(), timeOffRequest.getEnd());
-        }
-
-        return usedDays;
+        return timeOffRequests.stream()
+                .mapToInt(value -> getTimeOffDaysAmount(value.getStart(), value.getEnd()))
+                .sum();
     }
 
     private float countAvailableDays(Collection<TimeOffRequest> timeOffRequests, Type type) {
@@ -154,15 +157,15 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
             return type == Type.VACATION ?
                     estimatePossibleVacationBalance(LocalDate.now()) - usedDays
                     :
-                    (float) (TimeOffAccrual.FULLY_PAID_SICK_LEAVE - usedDays);
-        } else {
-            return 0;
+                    TimeOffAccrual.FULLY_PAID_SICK_LEAVE - usedDays;
         }
+
+        return 0;
     }
 
     private float estimatePossibleVacationBalance(LocalDate end) {
         return end.equals(end.with(TemporalAdjusters.lastDayOfMonth())) ?
-                end.getMonthValue() * VACATION : (end.getMonthValue() - 1) * VACATION;
+                end.getMonthValue() * TimeOffAccrual.VACATION : (end.getMonthValue() - 1) * TimeOffAccrual.VACATION;
     }
 
     private int getTimeOffDaysAmount(LocalDate start, LocalDate end) {
