@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import com.khneu.timeoff.constant.TimeOffAccrual;
 import com.khneu.timeoff.dto.*;
 import com.khneu.timeoff.exception.NoSuchEntityException;
+import com.khneu.timeoff.mail.TimeOffMailSender;
 import com.khneu.timeoff.mapper.Mapper;
 import com.khneu.timeoff.model.*;
 import com.khneu.timeoff.repository.RequestTypeRepository;
@@ -40,6 +41,9 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     @Autowired
     private Mapper mapper;
 
+    @Autowired
+    private TimeOffMailSender timeOffMailSender;
+
     @Override
     public List<TimeOffRequestDto> getTimeOffRequests(TimeOffRequestDto timeOffRequestDto) {
         TimeOffRequest timeOffRequest = mapper.toTimeOffRequest(timeOffRequestDto);
@@ -68,11 +72,15 @@ public class TimeOffRequestServiceImpl implements TimeOffRequestService {
     public TimeOffRequestDto changeTimeOffRequestStatus(int timeOffRequestId, CurrentRequestStatusDto currentRequestStatusDto) {
         TimeOffRequest timeOffRequest = timeOffRequestRepository.findById(timeOffRequestId)
                 .orElseThrow(() -> new NoSuchEntityException("No TimeOffRequest entity was found with id = " + timeOffRequestId));
-        CurrentRequestStatus currentRequestStatus = mapper.toCurrentRequestStatus(currentRequestStatusDto);
 
+        CurrentRequestStatus currentRequestStatus = mapper.toCurrentRequestStatus(currentRequestStatusDto);
         timeOffRequest.getCurrentRequestStatus().setEmployee(currentRequestStatus.getEmployee());
         timeOffRequest.getCurrentRequestStatus().setRequestStatus(currentRequestStatus.getRequestStatus());
         timeOffRequest.getCurrentRequestStatus().setLastChanged(LocalDateTime.now());
+
+        if (currentRequestStatus.getRequestStatus().getStatus() == Status.APPROVED) {
+            timeOffMailSender.send(timeOffRequest);
+        }
 
         return mapper.toTimeOffRequestDto(timeOffRequestRepository.save(timeOffRequest));
     }

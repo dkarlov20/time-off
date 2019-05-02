@@ -1,6 +1,7 @@
 package com.khneu.timeoff.controller;
 
 import com.khneu.timeoff.dto.ExceptionDetails;
+import com.khneu.timeoff.exception.BusinessException;
 import com.khneu.timeoff.exception.NoSuchEntityException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,12 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(NoSuchEntityException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDetails handleNoSuchEntityException(NoSuchEntityException e) {
+        return new ExceptionDetails(LocalDateTime.now().format(ISO_DATE_TIME), e.getMessage());
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDetails handleBusinessException(BusinessException e) {
         return new ExceptionDetails(LocalDateTime.now().format(ISO_DATE_TIME), e.getMessage());
     }
 }
