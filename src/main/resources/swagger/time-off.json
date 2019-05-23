@@ -1,0 +1,729 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Documentation of all project endpoints",
+    "version": "1.0",
+    "title": "Time Off Documentation",
+    "termsOfService": "urn:tos",
+    "contact": {},
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "tags": [
+    {
+      "name": "Employee Controller",
+      "description": "All endpoints connected with employee"
+    },
+    {
+      "name": "Request Status Controller",
+      "description": "All endpoints connected with request status"
+    },
+    {
+      "name": "Request Type Controller",
+      "description": "All endpoints connected with request type"
+    },
+    {
+      "name": "Time Off Request Controller",
+      "description": "All endpoints connected with time off"
+    }
+  ],
+  "paths": {
+    "/v1/employees/{id}": {
+      "get": {
+        "tags": [
+          "Employee Controller"
+        ],
+        "summary": "Get employee by id",
+        "operationId": "getByIdUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id of the employee",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/EmployeeDto"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/request_statuses": {
+      "get": {
+        "tags": [
+          "Request Status Controller"
+        ],
+        "summary": "Get request status by status",
+        "operationId": "getByStatusUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "status",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "REQUESTED",
+              "APPROVED",
+              "DENIED",
+              "SUPERSEDED",
+              "CANCELED"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/RequestStatusDto"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/request_types": {
+      "get": {
+        "tags": [
+          "Request Type Controller"
+        ],
+        "summary": "get request type by type",
+        "operationId": "getRequestTypeByTypeUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "type",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "VACATION",
+              "FULLY_PAID_SICK_LEAVE",
+              "COMPENSATORY_LEAVE",
+              "UNPAID_VACATION",
+              "BLOOD_DONATION",
+              "BEREAVEMENT_LEAVE",
+              "PARENTAL_LEAVE",
+              "WFH"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/RequestTypeDto"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/time-offs/balances/{employeeId}": {
+      "get": {
+        "tags": [
+          "Time Off Request Controller"
+        ],
+        "summary": "get balance for for time off by employee",
+        "operationId": "getTimeOffBalanceUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "path",
+            "description": "employee id",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TimeOffBalanceDto"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/time-offs/employees/out": {
+      "get": {
+        "tags": [
+          "Time Off Request Controller"
+        ],
+        "summary": "get employees who are out in given days",
+        "operationId": "getOutEmployeesUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "end",
+            "in": "query",
+            "description": "end (yyyy-MM-dd)",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "start (yyyy-MM-dd)",
+            "required": true,
+            "type": "string",
+            "format": "date"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OutEmployeesDto"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/time-offs/estimations": {
+      "get": {
+        "tags": [
+          "Time Off Request Controller"
+        ],
+        "summary": "estimate possible number of days for time off",
+        "operationId": "estimateTimeOffUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "query",
+            "description": "employee id",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "end (yyyy-MM-dd)",
+            "required": true,
+            "type": "string",
+            "format": "date"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/EstimateDto"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/time-offs/requests": {
+      "get": {
+        "tags": [
+          "Time Off Request Controller"
+        ],
+        "summary": "get time off request by given filters",
+        "operationId": "getTimeOffRequestsUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "query",
+            "description": "employee id",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "end (yyyy-MM-dd)",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "id",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "start (yyyy-MM-dd)",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "status",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "REQUESTED",
+              "APPROVED",
+              "DENIED",
+              "SUPERSEDED",
+              "CANCELED"
+            ]
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "type",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "VACATION",
+              "FULLY_PAID_SICK_LEAVE",
+              "COMPENSATORY_LEAVE",
+              "UNPAID_VACATION",
+              "BLOOD_DONATION",
+              "BEREAVEMENT_LEAVE",
+              "PARENTAL_LEAVE",
+              "WFH"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TimeOffRequestDto"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      },
+      "put": {
+        "tags": [
+          "Time Off Request Controller"
+        ],
+        "summary": "create new time off request",
+        "operationId": "saveTimeOffRequestUsingPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "timeOffRequest",
+            "description": "TimeOffRequestDto object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TimeOffRequestDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/TimeOffRequestDto"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/time-offs/requests/{id}/statuses": {
+      "put": {
+        "tags": [
+          "Time Off Request Controller"
+        ],
+        "summary": "change status of the time off request",
+        "operationId": "changeTimeOffRequestStatusUsingPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "currentRequestStatus",
+            "description": "CurrentRequestStatusDto object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CurrentRequestStatusDto"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/TimeOffRequestDto"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "definitions": {
+    "CurrentRequestStatusDto": {
+      "type": "object",
+      "properties": {
+        "employee": {
+          "$ref": "#/definitions/EmployeeDto"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "lastChanged": {
+          "type": "string"
+        },
+        "requestStatus": {
+          "$ref": "#/definitions/RequestStatusDto"
+        }
+      },
+      "title": "CurrentRequestStatusDto"
+    },
+    "EmployeeDto": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "employeePosition": {
+          "$ref": "#/definitions/EmployeePositionDto"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "lastName": {
+          "type": "string"
+        }
+      },
+      "title": "EmployeeDto"
+    },
+    "EmployeePositionDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "position": {
+          "type": "string",
+          "enum": [
+            "DEVELOPER",
+            "QA",
+            "AQA",
+            "DEVOPS",
+            "DESIGNER",
+            "LEAD",
+            "ARCHITECT",
+            "MANAGER",
+            "HR"
+          ]
+        }
+      },
+      "title": "EmployeePositionDto"
+    },
+    "EstimateDto": {
+      "type": "object",
+      "properties": {
+        "sickLeaveBalance": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "vacationBalance": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "title": "EstimateDto"
+    },
+    "NoteDto": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string"
+        },
+        "employee": {
+          "$ref": "#/definitions/EmployeeDto"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "title": "NoteDto"
+    },
+    "OutEmployeesDto": {
+      "type": "object",
+      "properties": {
+        "employee": {
+          "$ref": "#/definitions/EmployeeDto"
+        },
+        "end": {
+          "type": "string"
+        },
+        "start": {
+          "type": "string"
+        },
+        "timeOffRequestId": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "OutEmployeesDto"
+    },
+    "RequestStatusDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "REQUESTED",
+            "APPROVED",
+            "DENIED",
+            "SUPERSEDED",
+            "CANCELED"
+          ]
+        }
+      },
+      "title": "RequestStatusDto"
+    },
+    "RequestTypeDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "VACATION",
+            "FULLY_PAID_SICK_LEAVE",
+            "COMPENSATORY_LEAVE",
+            "UNPAID_VACATION",
+            "BLOOD_DONATION",
+            "BEREAVEMENT_LEAVE",
+            "PARENTAL_LEAVE",
+            "WFH"
+          ]
+        }
+      },
+      "title": "RequestTypeDto"
+    },
+    "TimeOffBalanceDto": {
+      "type": "object",
+      "properties": {
+        "availableDays": {
+          "type": "number",
+          "format": "float"
+        },
+        "requestType": {
+          "$ref": "#/definitions/RequestTypeDto"
+        },
+        "usedDays": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "TimeOffBalanceDto"
+    },
+    "TimeOffRequestDto": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date"
+        },
+        "currentRequestStatus": {
+          "$ref": "#/definitions/CurrentRequestStatusDto"
+        },
+        "daysAmount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "employee": {
+          "$ref": "#/definitions/EmployeeDto"
+        },
+        "end": {
+          "type": "string",
+          "format": "date"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NoteDto"
+          }
+        },
+        "requestType": {
+          "$ref": "#/definitions/RequestTypeDto"
+        },
+        "start": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "title": "TimeOffRequestDto"
+    }
+  }
+}
